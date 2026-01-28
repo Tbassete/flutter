@@ -1,47 +1,74 @@
 import 'package:flutter/material.dart';
-import './questao.dart';
-import './resposta.dart';
+import './resultado.dart';
+import './questionario.dart';
 
 main() => runApp(PerguntaApp());
 
 class _PerguntaAppState extends State<PerguntaApp> {
   var perguntaSelecionada = 0;
+  var pontuacaoTotal = 0;
+  void _responder(int nota) {
+    if (temPerguntaSelecionada) {
+      setState(() {
+        perguntaSelecionada++;
+        pontuacaoTotal += nota;
+      });
+    }
+  }
 
-  void _responder() {
+  void _reiniciarQuestionario() {
     setState(() {
-      perguntaSelecionada++;
+      perguntaSelecionada = 0;
+      pontuacaoTotal = 0;
     });
-    print(perguntaSelecionada);
+  }
+
+  final List<Map<String, Object>> _perguntas = [
+    {
+      'texto': 'quem é??',
+      'respostas': [
+        {'texto': 'molodoy', 'nota': 10},
+        {'texto': 'niko', 'nota': 3},
+        {'texto': 'monesy', 'nota': 3},
+        {'texto': 'donk', 'nota': 4},
+      ],
+    },
+    {
+      'texto': 'é molodoy ou não é',
+      'respostas': [
+        {'texto': 'é', 'nota': 5},
+        {'texto': 'é molodoy', 'nota': 7},
+        {'texto': 'não é', 'nota': 0},
+        {'texto': 'é molodoy porra', 'nota': 10},
+      ],
+    },
+    {
+      'texto': 'g???3???',
+      'respostas': [
+        {'texto': 'x?????', 'nota': 10},
+        {'texto': 'y', 'nota': 0},
+        {'texto': 'u', 'nota': 0},
+        {'texto': 'p', 'nota': 0},
+      ],
+    },
+  ];
+
+  bool get temPerguntaSelecionada {
+    return perguntaSelecionada < _perguntas.length;
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, Object>> perguntas = [
-      {
-        'texto': 'quem é',
-        'respostas': ['molodoy', 'niko', 'monesy', 'donk'],
-      },
-      {
-        'texto': 'é molodoy ou não é',
-        'respostas': ['é', 'é molodoy', 'não é', 'é molodoy porra'],
-      },
-      {
-        'texto': 'g???3???',
-        'respostas': ['x?????', 'y', 'u', 'p'],
-      },
-    ];
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: Text('Perguntas')),
-        body: Column(
-          children: <Widget>[
-            Questao(perguntas[perguntaSelecionada]['texto'].toString()),
-            Resposta('resposta 1', _responder),
-            Resposta('resposta 2', _responder),
-            Resposta('resposta 3', _responder),
-          ],
-        ),
+        body: temPerguntaSelecionada
+            ? Questionario(
+                perguntaSelecionada: perguntaSelecionada,
+                perguntas: _perguntas,
+                responder: _responder,
+              )
+            : Resultado(pontuacaoTotal, _reiniciarQuestionario),
       ),
     );
   }
